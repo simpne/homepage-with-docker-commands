@@ -16,4 +16,5 @@
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
     },
+    "CodeGPT.apiKey": "Codex",
 }

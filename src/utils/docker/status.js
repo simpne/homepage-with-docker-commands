@@ -6,8 +6,10 @@ import { containersFromConfig, hasHomepageLabels } from "utils/config/service-he
 
 const HEALTH_STATES = ["healthy", "unhealthy", "starting"];
 
-function statusEntry(state, health) {
-  return health ? { status: state, health } : { status: state };
+function statusEntry(state, health, controlSupported = true) {
+  const entry = health ? { status: state, health } : { status: state };
+  if (!controlSupported) entry.controlSupported = false;
+  return entry;
 }
 
 // docker exposes health only as a filter on the list endpoint, never as a field
@@ -46,7 +48,7 @@ export async function getDockerStatuses(server) {
   const byId = {};
 
   containers.forEach((container) => {
-    const info = statusEntry(container.State, health[container.Id]);
+    const info = statusEntry(container.State, health[container.Id], !dockerArgs.swarm);
     // keyed by id for every container so swarm tasks can resolve their local container
     byId[container.Id] = info;
 
@@ -82,9 +84,9 @@ export async function getDockerStatuses(server) {
     if (service.Spec.Mode?.Replicated) {
       const replicas = parseInt(service.Spec.Mode.Replicated.Replicas, 10);
       if (serviceTasks.length === replicas) {
-        statuses[name] = { status: `running ${serviceTasks.length}/${replicas}` };
+        statuses[name] = { status: `running ${serviceTasks.length}/${replicas}`, controlSupported: false };
       } else if (serviceTasks.length > 0) {
-        statuses[name] = { status: `partial ${serviceTasks.length}/${replicas}` };
+        statuses[name] = { status: `partial ${serviceTasks.length}/${replicas}`, controlSupported: false };
       }
       return;
     }
@@ -96,7 +98,7 @@ export async function getDockerStatuses(server) {
     if (containerId && byId[containerId]) {
       statuses[name] = byId[containerId];
     } else if (task) {
-      statuses[name] = { status: task.Status.State };
+      statuses[name] = { status: task.Status.State, controlSupported: false };
     }
   });
 

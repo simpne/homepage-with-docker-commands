@@ -177,8 +177,8 @@ describe("pages/api/docker/statuses", () => {
     expect(res.statusCode).toBe(200);
     expect(res.body).toEqual({
       statuses: {
-        web: { status: "running" },
-        api: { status: "running 2/2" },
+        web: { status: "running", controlSupported: false },
+        api: { status: "running 2/2", controlSupported: false },
       },
     });
   });
@@ -217,7 +217,7 @@ describe("pages/api/docker/statuses", () => {
 
     await handler(req, res);
 
-    expect(res.body).toEqual({ statuses: { api: { status: "running 1/1" } } });
+    expect(res.body).toEqual({ statuses: { api: { status: "running 1/1", controlSupported: false } } });
   });
 
   it("returns only listed containers when swarm queries fail", async () => {
@@ -233,7 +233,7 @@ describe("pages/api/docker/statuses", () => {
     await handler(req, res);
 
     expect(res.statusCode).toBe(200);
-    expect(res.body).toEqual({ statuses: { web: { status: "running" } } });
+    expect(res.body).toEqual({ statuses: { web: { status: "running", controlSupported: false } } });
   });
 
   it("returns 500 when docker returns a non-array containers payload", async () => {

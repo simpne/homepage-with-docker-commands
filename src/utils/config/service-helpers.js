@@ -83,6 +83,18 @@ export async function containersFromConfig(server) {
   return new Set(matching.map((ref) => ref.container));
 }
 
+export async function controllableDockerContainersFromConfig(server) {
+  const target = server || "";
+  const services = flattenServices(await servicesFromConfig());
+  const matching = services.flatMap((service) =>
+    dockerWidgets(service)
+      .filter((widget) => widget.controls === true && widget.container && (widget.server || "") === target)
+      .map((widget) => widget.container),
+  );
+
+  return new Set(matching);
+}
+
 // homepage.foo -> foo, homepage.instance.<this instance>.foo -> foo, another instance -> null
 export function homepageLabelValue(label, instanceName) {
   if (!label.startsWith("homepage.")) return null;

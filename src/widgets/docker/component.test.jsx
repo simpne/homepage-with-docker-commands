@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { renderWithProviders } from "test-utils/render-with-providers";
 
@@ -14,6 +14,10 @@ vi.mock("swr", () => ({
 import Component from "./component";
 
 describe("widgets/docker/component", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -29,6 +33,85 @@ describe("widgets/docker/component", () => {
 
     expect(screen.getByText("widget.status")).toBeInTheDocument();
     expect(screen.getByText("docker.offline")).toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("shows a start button for a configured offline container when controls are enabled", () => {
+    useSWR
+      .mockReturnValueOnce({ data: { statuses: { c: { status: "exited" } } }, error: undefined })
+      .mockReturnValueOnce({ data: undefined, error: undefined });
+
+    renderWithProviders(<Component service={{ widget: { type: "docker", container: "c", controls: true } }} />, {
+      settings: { hideErrors: false },
+    });
+
+    expect(screen.getByRole("button", { name: "docker.start" })).toBeInTheDocument();
+  });
+
+  it("does not show controls for a Docker Swarm service", () => {
+    useSWR
+      .mockReturnValueOnce({
+        data: { statuses: { c: { status: "running 1/1", controlSupported: false } } },
+        error: undefined,
+      })
+      .mockReturnValueOnce({ data: undefined, error: undefined });
+
+    renderWithProviders(<Component service={{ widget: { type: "docker", container: "c", controls: true } }} />, {
+      settings: { hideErrors: false },
+    });
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("sends a stop request for a running container and refreshes its data", async () => {
+    const mutateStatuses = vi.fn();
+    const mutateStats = vi.fn();
+    useSWR.mockImplementation((key) =>
+      key.includes("/statuses")
+        ? { data: { statuses: { c: { status: "running" } } }, mutate: mutateStatuses }
+        : { data: { stats: { c: { cpu: 1 } } }, mutate: mutateStats },
+    );
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ action: "stop" }) }));
+
+    renderWithProviders(
+      <Component service={{ widget: { type: "docker", container: "c", server: "local", controls: true } }} />,
+      { settings: { hideErrors: false } },
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "docker.stop" }));
+
+    await waitFor(() => {
+      expect(fetch).toHaveBeenCalledWith(
+        "/api/docker/control",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({ server: "local", container: "c", action: "stop" }),
+        }),
+      );
+      expect(mutateStatuses).toHaveBeenCalled();
+      expect(mutateStats).toHaveBeenCalled();
+    });
+  });
+
+  it("displays control errors", async () => {
+    useSWR.mockImplementation((key) =>
+      key.includes("/statuses") ? { data: { statuses: { c: { status: "exited" } } } } : { data: undefined },
+    );
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: false,
+        json: async () => ({ error: { message: "Docker API is read-only" } }),
+      }),
+    );
+
+    renderWithProviders(<Component service={{ widget: { type: "docker", container: "c", controls: true } }} />, {
+      settings: { hideErrors: false },
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "docker.start" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Docker API is read-only");
   });
 
   it("surfaces a docker error payload instead of reporting the container offline", () => {

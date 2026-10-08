@@ -134,6 +134,24 @@ Inside of the service you'd like to connect to docker:
   container: emby # The name of the container you'd like to connect
 ```
 
+### Start and stop containers from the dashboard
+
+The Docker service widget can expose a button to start or stop its configured container:
+
+```yaml
+- Emby:
+    server: my-remote-docker
+    widget:
+      type: docker
+      server: my-remote-docker
+      container: emby
+      controls: true
+```
+
+The button follows the container state and changes between **Start** and **Stop**. Paused containers show **Unpause**. Controls are supported for regular Docker containers, not Docker Swarm services. When Homepage authentication is enabled, a signed-in session is required to use them.
+
+Container controls require write access to the Docker API. If you use a Docker Socket Proxy, enable `POST=1` and keep the proxy accessible only to trusted clients. Homepage only accepts actions for Docker widgets explicitly configured with `controls: true`.
+
 ## Automatic Service Discovery
 
 Homepage features automatic service discovery for containers with the proper labels attached, all configuration options can be applied using dot notation, beginning with `homepage`.

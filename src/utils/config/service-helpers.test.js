@@ -19,8 +19,8 @@ const { state, fs, yaml, config, Docker, dockerCfg, kubeCfg, kubeApi } = vi.hois
 
   const fs = {
     readFile: vi.fn(async (filePath) => {
-      if (String(filePath).endsWith("/services.yaml")) return "services";
-      if (String(filePath).endsWith("/docker.yaml")) return "docker";
+      if (String(filePath).endsWith("services.yaml")) return "services";
+      if (String(filePath).endsWith("docker.yaml")) return "docker";
       return "";
     }),
   };
@@ -173,6 +173,30 @@ describe("utils/config/service-helpers", () => {
 
     const mod = await import("./service-helpers");
     expect(await mod.containersFromConfig("local")).toEqual(new Set());
+  });
+
+  it("controllableDockerContainersFromConfig includes only enabled docker widgets on the requested server", async () => {
+    state.servicesYaml = [
+      {
+        Group: [
+          {
+            Enabled: {
+              widget: { type: "docker", container: "enabled", server: "local", controls: true },
+              widgets: [{ type: "docker", container: "enabled-array", server: "local", controls: true }],
+            },
+          },
+          { Disabled: { widget: { type: "docker", container: "disabled", server: "local" } } },
+          {
+            Remote: {
+              widget: { type: "docker", container: "remote", server: "remote", controls: true },
+            },
+          },
+        ],
+      },
+    ];
+
+    const mod = await import("./service-helpers");
+    expect(await mod.controllableDockerContainersFromConfig("local")).toEqual(new Set(["enabled", "enabled-array"]));
   });
 
   it("homepageLabelValue strips the prefix and honors instance scoping", async () => {
