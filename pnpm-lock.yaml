@@ -57,8 +57,8 @@ importers:
         specifier: ^4.24.15
         version: 4.24.15(next@16.3.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.2.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       next-i18next:
-        specifier: ^16.0.8
-        version: 16.0.10(@types/react@19.2.18)(i18next@26.4.2(typescript@6.0.3))(next@16.3.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.2.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-i18next@17.0.15(i18next@26.4.2(typescript@6.0.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@6.0.3))(react@19.3.0)
+        specifier: ^16.4.3
+        version: 16.4.3(@types/react@19.2.18)(i18next@26.4.2(typescript@6.0.3))(next@16.3.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.2.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-i18next@17.0.15(i18next@26.4.2(typescript@6.0.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@6.0.3))(react@19.3.0)
       ping:
         specifier: ^1.0.0
         version: 1.0.0
@@ -82,7 +82,7 @@ importers:
         version: 5.7.0(react@19.3.0)
       recharts:
         specifier: ^3.1.2
-        version: 3.10.1(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react-is@17.0.2)(react@19.3.0)(redux@5.0.1)
+        version: 3.10.1(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react-is@16.13.1)(react@19.3.0)(redux@5.0.1)
       sax:
         specifier: ^1.6.1
         version: 1.6.1
@@ -2855,14 +2855,21 @@ packages:
       nodemailer:
         optional: true
 
-  next-i18next@16.0.10:
-    resolution: {integrity: sha512-nUcp2rL5Y2Iy6IxayF/qY+rrYdQzuvxD+wWHMjabXvFA9i+L8kFXmFkbXI2/4RQ/HwW/MfVEro116Tm0W3vbYA==}
+  next-i18next@16.4.3:
+    resolution: {integrity: sha512-eYSjAw25ndsKuvfc5Cyjs/Nb9ZrYG6Hm6g9YGm+pm3C0sBVFUwpCqZv87MrWPG8PW/tpopmUM5o8M3KpbaMIrw==}
     engines: {node: '>=20'}
     peerDependencies:
       i18next: '>= 23.7.13'
+      i18next-icu: '>= 2.0.0'
+      i18next-mf2: '>= 1.0.0'
       next: '>= 14.1.0'
       react: '>= 18.0.0'
       react-i18next: '>= 14.0.0'
+    peerDependenciesMeta:
+      i18next-icu:
+        optional: true
+      i18next-mf2:
+        optional: true
 
   next@16.3.6:
     resolution: {integrity: sha512-L+otWM/aQbYTx98aZhgEoMb4bZAXx1YVW4UMA/vuCyCoWG5HJyZUili8QAkqzrcC+5///tsz3s0M+SlyB5bLMw==}
@@ -6566,7 +6573,7 @@ snapshots:
       react-dom: 19.3.0(react@19.3.0)
       uuid: 11.1.1
 
-  next-i18next@16.0.10(@types/react@19.2.18)(i18next@26.4.2(typescript@6.0.3))(next@16.3.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.2.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-i18next@17.0.15(i18next@26.4.2(typescript@6.0.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@6.0.3))(react@19.3.0):
+  next-i18next@16.4.3(@types/react@19.2.18)(i18next@26.4.2(typescript@6.0.3))(next@16.3.6(@babel/core@7.29.7(supports-color@7.2.0))(@types/node@26.2.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0))(react-i18next@17.0.15(i18next@26.4.2(typescript@6.0.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(typescript@6.0.3))(react@19.3.0):
     dependencies:
       '@types/hoist-non-react-statics': 3.3.7(@types/react@19.2.18)
       hoist-non-react-statics: 3.3.2
@@ -6909,7 +6916,7 @@ snapshots:
       string_decoder: 1.3.0
       util-deprecate: 1.0.2
 
-  recharts@3.10.1(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react-is@17.0.2)(react@19.3.0)(redux@5.0.1):
+  recharts@3.10.1(@types/react@19.2.18)(react-dom@19.3.0(react@19.3.0))(react-is@16.13.1)(react@19.3.0)(redux@5.0.1):
     dependencies:
       '@reduxjs/toolkit': 2.12.0(react-redux@9.3.0(@types/react@19.2.18)(react@19.3.0)(redux@5.0.1))(react@19.3.0)
       clsx: 2.1.1
@@ -6919,7 +6926,7 @@ snapshots:
       immer: 11.1.16
       react: 19.3.0
       react-dom: 19.3.0(react@19.3.0)
-      react-is: 17.0.2
+      react-is: 16.13.1
       react-redux: 9.3.0(@types/react@19.2.18)(react@19.3.0)(redux@5.0.1)
       reselect: 5.2.0
       tiny-invariant: 1.3.3
